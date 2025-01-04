@@ -6,7 +6,7 @@
     }
   },
   "functions": {
-    "api/**/*.js": {
+    "pages/api/convert.js": {
       "includeFiles": "public/templates/**"
     }
   }
