@@ -82,6 +82,15 @@ export default async function handler(req, res) {
     // Merge the PDFs
     const generatedPdfDoc = await PDFDocument.load(generatedPdfBytes);
     const lastPagePdfDoc = await PDFDocument.load(lastPagePdfBytes);
+
+    // Remove any blank pages from the generated PDF
+    const pages = generatedPdfDoc.getPages();
+    for (let i = pages.length - 1; i >= 0; i--) {
+      if (pages[i].getTextContent().items.length === 0) {
+        generatedPdfDoc.removePage(i);
+      }
+    }
+
     const [lastPage] = await generatedPdfDoc.copyPages(lastPagePdfDoc, [0]);
     generatedPdfDoc.addPage(lastPage);
 
