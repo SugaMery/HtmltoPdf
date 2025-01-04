@@ -33,13 +33,8 @@ export default async function handler(req, res) {
       }
     });
 
-    // Ensure the 'converted' directory exists
-    const convertedDir = path.join(process.cwd(), "public", "converted");
-    if (!fs.existsSync(convertedDir)) {
-      fs.mkdirSync(convertedDir);
-    }
-
-    const pdfPath = path.join(convertedDir, "contrat.pdf");
+    // Use /tmp for storing the PDF, as it's writable in serverless environments
+    const pdfPath = path.join("/tmp", "contrat.pdf");
 
     // Launch Puppeteer with Vercel-compatible settings
     const browser = await puppeteer.launch({
@@ -60,7 +55,7 @@ export default async function handler(req, res) {
     res.setHeader("Content-Disposition", `attachment; filename="contrat.pdf"`);
     res.send(fs.readFileSync(pdfPath));
 
-    // Clean up the temporary PDF file
+    // Clean up the temporary PDF file (optional, as it's in the /tmp directory and will be cleared after execution)
     fs.unlinkSync(pdfPath);
   } catch (error) {
     console.error("Error during conversion:", error);
