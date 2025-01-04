@@ -88,7 +88,7 @@ export default async function handler(req, res) {
     for (let i = pages.length - 1; i >= 0; i--) {
       const page = pages[i];
       const contentStreams = page.node.Contents();
-      if (!contentStreams || contentStreams.array.length === 0 || contentStreams.array.every(stream => stream.contents.length === 0)) {
+      if (!contentStreams || !contentStreams.array || contentStreams.array.length === 0 || contentStreams.array.every(stream => !stream.contents || stream.contents.length === 0)) {
         generatedPdfDoc.removePage(i);
       }
     }
