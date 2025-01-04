@@ -37,8 +37,9 @@ export default async function handler(req, res) {
         } else {
           if (replaceWord == "notFound" || replaceWord == "") {
             console.log("replaceWord", replaceWord, replaceWord == "");
+            htmlContent = htmlContent.replace(regex, replaceWord || " ");
           }
-          htmlContent = htmlContent.replace(regex, replaceWord || " ");
+        
         }
       }
     });
