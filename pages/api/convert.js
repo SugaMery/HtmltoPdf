@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chrome from "chrome-aws-lambda";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -28,7 +29,11 @@ export default async function handler(req, res) {
       }
     });
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      args: [...chrome.args],
+      executablePath: await chrome.executablePath,
+      headless: chrome.headless,
+    });
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: "load" });
 
