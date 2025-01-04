@@ -14,8 +14,18 @@ export default async function handler(req, res) {
     return res.status(400).send("Invalid input: 'replacements' must be an array.");
   }
 
-  try {
+  // Validate each replacement object
+  for (const replacement of replacements) {
+    if (
+      typeof replacement !== "object" ||
+      !replacement.hasOwnProperty("searchWord") ||
+      !replacement.hasOwnProperty("replaceWord")
+    ) {
+      return res.status(400).send("Invalid input: each replacement must be an object with 'searchWord' and 'replaceWord' properties.");
+    }
+  }
 
+  try {
     const templatePath = path.join(process.cwd(), "public", "templates", "facture.html");
     let htmlContent = fs.readFileSync(templatePath, "utf-8");
 
@@ -40,7 +50,6 @@ export default async function handler(req, res) {
 
     // Use /tmp for storing the PDF temporarily
     const pdfPath = path.join("/tmp", "facture.pdf");
-
     await page.pdf({ path: pdfPath, format: "A4" });
     await browser.close();
 
