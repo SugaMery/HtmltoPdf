@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
+import { PDFDocument } from "pdf-lib";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -29,19 +30,27 @@ export default async function handler(req, res) {
     const templatePath = path.join(process.cwd(), "public", "templates", "finalLast.html");
     let htmlContent = fs.readFileSync(templatePath, "utf-8");
 
+    // Create a map of searchWord to replaceWord
+    const replacementsMap = new Map();
     replacements.forEach(({ searchWord, replaceWord }) => {
       if (searchWord && replaceWord !== undefined) {
-        const regex = new RegExp(searchWord, "g");
-        if (replaceWord.startsWith("data:image") || replaceWord.startsWith("http")) {
-          htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`);
-        } else if (replaceWord == "notFound" || replaceWord == "") {
-          console.log("replaceWord", replaceWord, replaceWord == "");
-          // Handle empty string replacement
-          htmlContent = htmlContent.replace(regex, " ");
-        } else {
-          // Regular text replacement
-          htmlContent = htmlContent.replace(regex, replaceWord);
-        }
+        replacementsMap.set(searchWord, replaceWord);
+      }
+    });
+
+    // Create a single regex to match all searchWords
+    const searchWords = Array.from(replacementsMap.keys()).join("|");
+    const regex = new RegExp(searchWords, "g");
+
+    // Replace all searchWords in one pass
+    htmlContent = htmlContent.replace(regex, (matched) => {
+      const replaceWord = replacementsMap.get(matched);
+      if (replaceWord.startsWith("data:image") || replaceWord.startsWith("http")) {
+        return `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`;
+      } else if (replaceWord == "notFound" || replaceWord == "") {
+        return " ";
+      } else {
+        return replaceWord;
       }
     });
 
@@ -55,13 +64,33 @@ export default async function handler(req, res) {
 
     // Use /tmp for storing the PDF temporarily
     const pdfPath = path.join("/tmp", "contrat.pdf");
-    await page.pdf({ path: pdfPath, format: "A4" });
+    const pdfOptions = {
+      path: pdfPath,
+      format: "A4",
+      printBackground: true,
+      width: '210mm', // A4 width
+      height: '297mm', // A4 height
+    };
+    await page.pdf(pdfOptions);
     await browser.close();
 
-    // Send the PDF as a response
+    // Load the generated PDF and the last page PDF
+    const generatedPdfBytes = fs.readFileSync(pdfPath);
+    const lastPagePdfPath = path.join(process.cwd(), "public", "templates", "lastpage.pdf");
+    const lastPagePdfBytes = fs.readFileSync(lastPagePdfPath);
+
+    // Merge the PDFs
+    const generatedPdfDoc = await PDFDocument.load(generatedPdfBytes);
+    const lastPagePdfDoc = await PDFDocument.load(lastPagePdfBytes);
+    const [lastPage] = await generatedPdfDoc.copyPages(lastPagePdfDoc, [0]);
+    generatedPdfDoc.addPage(lastPage);
+
+    const mergedPdfBytes = await generatedPdfDoc.save();
+
+    // Send the merged PDF as a response
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="contrat.pdf"`);
-    res.send(fs.readFileSync(pdfPath));
+    res.send(Buffer.from(mergedPdfBytes));
 
     // Clean up the temporary file
     fs.unlinkSync(pdfPath);
