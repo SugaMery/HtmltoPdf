@@ -28,25 +28,22 @@ export default async function handler(req, res) {
       }
     });
 
-    // Ensure the 'converted' directory exists
-    const convertedDir = path.join(process.cwd(), "public", "converted");
-    if (!fs.existsSync(convertedDir)) {
-      fs.mkdirSync(convertedDir);
-    }
-
-    const pdfPath = path.join(convertedDir, "contrat.pdf");
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: "load" });
 
+    // Use /tmp for storing the PDF temporarily
+    const pdfPath = path.join("/tmp", "contrat.pdf");
     await page.pdf({ path: pdfPath, format: "A4" });
     await browser.close();
 
+    // Send the PDF as a response
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="contrat.pdf"`);
     res.send(fs.readFileSync(pdfPath));
 
-    fs.unlinkSync(pdfPath); // Clean up the temporary file
+    // Clean up the temporary file
+    fs.unlinkSync(pdfPath);
   } catch (error) {
     console.error("Error during conversion:", error);
     res.status(500).send("An error occurred during HTML to PDF conversion.");
