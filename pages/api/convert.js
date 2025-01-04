@@ -66,10 +66,9 @@ export default async function handler(req, res) {
     const pdfPath = path.join("/tmp", "contrat.pdf");
     const pdfOptions = {
       path: pdfPath,
-      format: "A4",
       printBackground: true,
       width: '210mm', // A4 width
-      height: '297mm', // A4 height
+      height: 'auto', // Auto height to fit content
     };
     await page.pdf(pdfOptions);
     await browser.close();
