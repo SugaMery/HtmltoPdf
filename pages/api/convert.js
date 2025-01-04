@@ -86,7 +86,9 @@ export default async function handler(req, res) {
     // Remove any blank pages from the generated PDF
     const pages = generatedPdfDoc.getPages();
     for (let i = pages.length - 1; i >= 0; i--) {
-      if (pages[i].getTextContent().items.length === 0) {
+      const page = pages[i];
+      const contentStream = page.node.Contents();
+      if (!contentStream || contentStream.size() === 0) {
         generatedPdfDoc.removePage(i);
       }
     }
