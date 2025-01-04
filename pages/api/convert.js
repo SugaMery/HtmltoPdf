@@ -34,12 +34,13 @@ export default async function handler(req, res) {
         const regex = new RegExp(searchWord, "g");
         if (replaceWord.startsWith("data:image") || replaceWord.startsWith("http")) {
           htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`);
+        } else if (replaceWord == "notFound" || replaceWord == "") {
+          console.log("replaceWord", replaceWord, replaceWord == "");
+          // Handle empty string replacement
+          htmlContent = htmlContent.replace(regex, " ");
         } else {
-          if (replaceWord == "notFound" || replaceWord == "") {
-            console.log("replaceWord", replaceWord, replaceWord == "");
-            htmlContent = htmlContent.replace(regex, replaceWord || " ");
-          }
-        
+          // Regular text replacement
+          htmlContent = htmlContent.replace(regex, replaceWord);
         }
       }
     });
