@@ -35,6 +35,9 @@ export default async function handler(req, res) {
         if (replaceWord.startsWith("data:image") || replaceWord.startsWith("http")) {
           htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`);
         } else {
+          if (replaceWord == "notFound" || replaceWord == "") {
+            console.log("replaceWord", replaceWord, replaceWord == "");
+          }
           htmlContent = htmlContent.replace(regex, replaceWord || " ");
         }
       }
