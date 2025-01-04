@@ -14,6 +14,17 @@ export default async function handler(req, res) {
     return res.status(400).send("Invalid input: 'replacements' must be an array.");
   }
 
+  // Validate each replacement object
+  for (const replacement of replacements) {
+    if (
+      typeof replacement !== "object" ||
+      !replacement.hasOwnProperty("searchWord") ||
+      !replacement.hasOwnProperty("replaceWord")
+    ) {
+      return res.status(400).send("Invalid input: each replacement must be an object with 'searchWord' and 'replaceWord' properties.");
+    }
+  }
+
   try {
     const templatePath = path.join(process.cwd(), "public", "templates", "finalLast.html");
     let htmlContent = fs.readFileSync(templatePath, "utf-8");
