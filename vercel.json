@@ -8,6 +8,9 @@
   "functions": {
     "pages/api/convert.js": {
       "includeFiles": "public/templates/**"
-    }
+    },
+    "pages/api/convertFacture.js": {
+        "includeFiles": "public/templates/**"
+      }
   }
 }
