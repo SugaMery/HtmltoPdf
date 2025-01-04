@@ -1,0 +1,13 @@
+{
+  "build": {
+    "env": {
+      "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
+      "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/chromium-browser"
+    }
+  },
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "public/templates/**"
+    }
+  }
+}
