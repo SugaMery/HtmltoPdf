@@ -34,8 +34,6 @@ export default async function handler(req, res) {
       if (searchWord && replaceWord !== undefined) {
         const regex = new RegExp(searchWord, "g");
         if (typeof replaceWord === "string" && (replaceWord.startsWith("data:image") || replaceWord.startsWith("http"))) {
-          console.log("replaceWord image", replaceWord );
-
           htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`);
         } else if (replaceWord == "notFound" || replaceWord == "") {
           // Handle empty string replacement
