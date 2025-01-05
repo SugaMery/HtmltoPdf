@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     replacements.forEach(({ searchWord, replaceWord }) => {
       if (searchWord && replaceWord !== undefined) {
         const regex = new RegExp(searchWord, "g");
-        if (replaceWord.startsWith("data:image") || replaceWord.startsWith("http")) {
+        if (typeof replaceWord === "string" && (replaceWord.startsWith("data:image") || replaceWord.startsWith("http"))) {
           htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`);
         } else if (replaceWord == "notFound" || replaceWord == "") {
           console.log("replaceWord", replaceWord, replaceWord == "");
