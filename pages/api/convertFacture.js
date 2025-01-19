@@ -33,8 +33,12 @@ export default async function handler(req, res) {
       if (searchWord && replaceWord !== undefined) {
         const regex = new RegExp(searchWord, "g");
         if (typeof replaceWord === "string" && (replaceWord.startsWith("data:image") || replaceWord.startsWith("http"))) {
-          htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`);
-        } else {
+          if (searchWord === "{cachet}") {
+            //print("Cachet found cachet", replaceWord);
+            htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 1500px; height: 1700px;" />`);
+          } else {
+            htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`);
+          }        } else {
           htmlContent = htmlContent.replace(regex, replaceWord || " ");
         }
       }
