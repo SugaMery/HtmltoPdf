@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         if (typeof replaceWord === "string" && (replaceWord.startsWith("data:image") || replaceWord.startsWith("http"))) {
           if (searchWord === "{cachet}") {
             //print("Cachet found cachet", replaceWord);
-            htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 1500px; height: 1700px;" />`);
+            htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 1000px; height: 1500px;" />`);
           } else {
             htmlContent = htmlContent.replace(regex, `<img src="${replaceWord}" style="width: 550px; height: 400px;" />`);
           }
