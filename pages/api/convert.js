@@ -74,10 +74,17 @@ export default async function handler(req, res) {
     const lastPagePdfPath = path.join(process.cwd(), "public", "templates", "lastpage.pdf");
     const lastPagePdfBytes = fs.readFileSync(lastPagePdfPath);
     const lastPagePdfDoc = await PDFDocument.load(lastPagePdfBytes);
-    const [lastPage] = await generatedPdfDoc.copyPages(lastPagePdfDoc, [0]);
-    generatedPdfDoc.addPage(lastPage);
+    const [lastPage] = await lastPagePdfDoc.getPages();
+    const [generatedPage] = await generatedPdfDoc.getPages();
 
-    const mergedPdfBytes = await generatedPdfDoc.save();
+    const mergedPdfDoc = await PDFDocument.create();
+    const [copiedLastPage] = await mergedPdfDoc.copyPages(lastPagePdfDoc, [0]);
+    const [copiedGeneratedPage] = await mergedPdfDoc.copyPages(generatedPdfDoc, [0]);
+
+    mergedPdfDoc.addPage(copiedLastPage);
+    mergedPdfDoc.addPage(copiedGeneratedPage);
+
+    const mergedPdfBytes = await mergedPdfDoc.save();
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="contrat.pdf"`);
