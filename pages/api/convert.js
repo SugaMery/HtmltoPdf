@@ -76,11 +76,13 @@ export default async function handler(req, res) {
     const lastPagePdfDoc = await PDFDocument.load(lastPagePdfBytes);
 
     const mergedPdfDoc = await PDFDocument.create();
-    const [copiedLastPage] = await mergedPdfDoc.copyPages(lastPagePdfDoc, [0]);
+    const [copiedFirstPage] = await mergedPdfDoc.copyPages(lastPagePdfDoc, [0]);
     const [copiedGeneratedPage] = await mergedPdfDoc.copyPages(generatedPdfDoc, [0]);
+    const [copiedLastPage] = await mergedPdfDoc.copyPages(lastPagePdfDoc, [0]);
 
-    mergedPdfDoc.addPage(copiedLastPage);
+    mergedPdfDoc.addPage(copiedFirstPage);
     mergedPdfDoc.addPage(copiedGeneratedPage);
+    mergedPdfDoc.addPage(copiedLastPage);
 
     const mergedPdfBytes = await mergedPdfDoc.save();
 
