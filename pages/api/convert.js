@@ -74,8 +74,6 @@ export default async function handler(req, res) {
     const lastPagePdfPath = path.join(process.cwd(), "public", "templates", "lastpage.pdf");
     const lastPagePdfBytes = fs.readFileSync(lastPagePdfPath);
     const lastPagePdfDoc = await PDFDocument.load(lastPagePdfBytes);
-    const [lastPage] = await lastPagePdfDoc.getPages();
-    const [generatedPage] = await generatedPdfDoc.getPages();
 
     const mergedPdfDoc = await PDFDocument.create();
     const [copiedLastPage] = await mergedPdfDoc.copyPages(lastPagePdfDoc, [0]);
